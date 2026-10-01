@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SkyCheck — Protótipo de check-in</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ Ícones (sprite SVG) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="13" y1="5" x2="13" y2="19" stroke-dasharray="2 2"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+</svg>
+
+<div class="stage">
+
+  <!-- Índice de telas (apenas desktop) -->
+  <aside class="index" id="index" aria-label="Índice de telas"></aside>
+
+  <main>
+  <div class="phone" id="phone">
+    <div class="statusbar" id="statusbar"><span>9:41</span><span>5G ▂▄▆█ 87%</span></div>
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+
+    <div class="viewport" id="viewport">
+
+      <!-- ========================================================
+           ACESSO
+           ======================================================== -->
+
+      <!-- S00 · Splash -->
+      <section class="screen dark" id="s-splash" data-title="Splash" data-group="Acesso">
+        <div class="centered">
+          <div class="ph fixed on-dark" style="--w:96;--h:96" data-size="96×96"></div>
+          <div>
+            <h1 style="font-size:32px;font-weight:800">SkyCheck</h1>
+            <p style="color:#b9cbf0">Seu check-in, sem fila.</p>
+          </div>
+          <div class="spinner"></div>
+        </div>
+      </section>
+
+      <!-- S01 · Login -->
+      <section class="screen" id="s-login" data-title="Login" data-group="Acesso">
+        <div class="content" style="padding:0;gap:0">
+          <div class="hero" style="padding:28px 20px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+            <div class="ph fixed on-dark" style="--w:72;--h:72" data-size="72×72"></div>
+            <h1 style="font-size:26px">Bem-vindo ao SkyCheck</h1>
+            <p style="color:#b9cbf0">Entre para fazer seu check-in.</p>
+          </div>
+          <form class="form" data-submit="login" novalidate style="padding:20px 16px">
+            <div class="field">
+              <label for="lg-user">CPF ou e-mail</label>
+              <input id="lg-user" name="user" autocomplete="username" placeholder="000.000.000-00">
+            </div>
+            <div class="field">
+              <label for="lg-pass">Senha</label>
+              <input id="lg-pass" name="pass" type="password" autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <button class="link" type="button" data-toast="info|Recuperação de senha|Enviamos um link para o e-mail cadastrado." style="align-self:flex-end">Esqueci minha senha</button>
+            <button class="btn btn-primary" type="submit">Entrar</button>
+            <button class="btn btn-ghost" type="button" data-go="s-cadastro">Criar cadastro</button>
+            <button class="link" type="button" data-action="guest">Consultar voos e preços sem cadastro</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- S02 · Cadastro -->
+      <section class="screen" id="s-cadastro" data-title="Cadastro" data-group="Acesso">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Criar cadastro</h1>
+        </header>
+        <div class="content">
+          <p class="subtitle">Precisamos de alguns dados para o check-in e a compra de passagens.</p>
+          <form class="form" data-submit="register" novalidate id="form-register">
+            <div class="section-title">Dados pessoais</div>
+            <div class="field"><label>Nome completo *</label><input name="nome" autocomplete="name" required></div>
+            <div class="field"><label>CPF *</label><input name="cpf" data-mask="cpf" inputmode="numeric" placeholder="000.000.000-00" required></div>
+            <div class="field"><label>Data de nascimento *</label><input name="nasc" type="date" required></div>
+            <div class="section-title">Contato</div>
+            <div class="field"><label>E-mail *</label><input name="email" type="email" autocomplete="email" required></div>
+            <div class="field"><label>Telefone *</label><input name="tel" data-mask="phone" inputmode="tel" placeholder="(00) 00000-0000" required></div>
+            <div class="field"><label>Senha *</label><input name="senha" type="password" autocomplete="new-password" required><span class="hint">Mínimo de 6 caracteres.</span></div>
+            <div class="section-title">Endereço</div>
+            <div class="field"><label>CEP *</label><input name="cep" data-mask="cep" inputmode="numeric" placeholder="00000-000" required></div>
+            <div class="field"><label>Logradouro *</label><input name="rua" required></div>
+            <div class="field-row">
+              <div class="field"><label>Número *</label><input name="num" required></div>
+              <div class="field"><label>Complemento</label><input name="comp"></div>
+            </div>
+            <div class="field-row">
+              <div class="field" style="flex:2"><label>Cidade *</label><input name="cidade" required></div>
+              <div class="field"><label>UF *</label><input name="uf" maxlength="2" required></div>
+            </div>
+            <div class="section-title">Documento de identificação</div>
+            <div class="field"><label>Tipo</label><select><option>RG</option><option>CNH</option><option>Passaporte</option></select></div>
+            <div class="ph" style="--w:358;--h:160" data-label="Foto do documento" data-size="358×160"></div>
+            <button class="btn btn-ghost" type="button" data-toast="info|Câmera|Aqui o usuário fotografa ou anexa o documento.">
+              <svg class="i"><use href="#i-camera"/></svg> Fotografar documento
+            </button>
+            <button class="btn btn-primary" type="submit">Concluir cadastro</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           PRINCIPAL
+           ======================================================== -->
+
+      <!-- S03 · Tela inicial -->
+      <section class="screen" id="s-home" data-title="Tela inicial" data-group="Principal" data-tab="home">
+        <div class="content" style="padding:0;gap:0">
+          <div class="hero">
+            <div class="hello">
+              <div class="ph fixed round on-dark" style="--w:48;--h:48" data-size="48×48"></div>
+              <div><p>Olá,</p><h1 data-bind="userFirst"></h1></div>
+              <button class="bell" aria-label="Notificações" data-toast="info|Notificações|Você não tem novas mensagens."><svg class="i"><use href="#i-bell"/></svg></button>
+            </div>
+          </div>
+          <div class="home-body">
+            <button class="checkin-cta" data-action="startCheckin">
+              <span class="big"><svg class="i lg"><use href="#i-plane"/></svg></span>
+              <span><b>Fazer Check-in</b><span>Rápido, em poucos toques</span></span>
+              <svg class="i" style="margin-left:auto"><use href="#i-chevron"/></svg>
+            </button>
+
+            <div class="card next-trip">
+              <div class="row"><span class="section-title grow" style="margin:0">Próxima viagem</span><span class="chip" data-bind="statusChip"></span></div>
+              <div class="route">
+                <div class="city"><b data-bind="fromCode"></b><span data-bind="fromCity"></span></div>
+                <div class="mid"><svg class="i" style="color:var(--blue)"><use href="#i-plane"/></svg><span data-bind="flightNo"></span></div>
+                <div class="city end"><b data-bind="toCode"></b><span data-bind="toCity"></span></div>
+              </div>
+              <div class="row small muted"><svg class="i sm"><use href="#i-calendar"/></svg><span data-bind="dateTime"></span><span style="margin-left:auto">Portão <b data-bind="gate" style="color:var(--navy)"></b></span></div>
+              <button class="btn btn-ghost btn-sm" data-go="s-viagem" style="width:100%">Ver detalhes da viagem</button>
+            </div>
+
+            <div class="grid-2">
+              <button class="tile" data-go="s-viagens"><span class="ico"><svg class="i"><use href="#i-bag"/></svg></span>Minhas Viagens</button>
+              <button class="tile" data-go="s-busca"><span class="ico"><svg class="i"><use href="#i-search"/></svg></span>Comprar Passagem</button>
+              <button class="tile" data-go="s-reservas"><span class="ico"><svg class="i"><use href="#i-ticket"/></svg></span>Passagens e Reservas</button>
+              <button class="tile" data-go="s-bagagem"><span class="ico"><svg class="i"><use href="#i-bag"/></svg></span>Bagagem</button>
+              <button class="tile" data-go="s-perfil"><span class="ico"><svg class="i"><use href="#i-user"/></svg></span>Meu Perfil</button>
+              <button class="tile" data-go="s-ajuda"><span class="ico"><svg class="i"><use href="#i-help"/></svg></span>Ajuda e Atendimento</button>
+            </div>
+
+            <div class="ph" style="--w:358;--h:140" data-label="Banner promocional" data-size="358×140"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           CHECK-IN
+           ======================================================== -->
+
+      <!-- C1 · Companhia -->
+      <section class="screen" id="s-ci-companhia" data-title="1 · Companhia aérea" data-group="Check-in">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Check-in</h1>
+          <button class="ab-btn" data-tab-go="s-home" aria-label="Cancelar"><svg class="i"><use href="#i-x"/></svg></button>
+        </header>
+        <div class="stepper" data-step="1"></div>
+        <div class="content">
+          <h2 class="title">Qual é a sua companhia aérea?</h2>
+          <div class="big-options" id="companies"></div>
+        </div>
+      </section>
+
+      <!-- C2 · Reserva -->
+      <section class="screen" id="s-ci-reserva" data-title="2 · Código da reserva" data-group="Check-in">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Check-in</h1>
+          <button class="ab-btn" data-tab-go="s-home" aria-label="Cancelar"><svg class="i"><use href="#i-x"/></svg></button>
+        </header>
+        <div class="stepper" data-step="2"></div>
+        <form class="content" data-submit="findReservation" novalidate>
+          <div>
+            <span class="chip dark" data-bind="coName"></span>
+            <h2 class="title" style="margin-top:10px">Informe os dados da reserva</h2>
+          </div>
+          <button class="btn btn-ghost" type="button" data-sheet="sheet-qr"><svg class="i"><use href="#i-qr"/></svg> Ler QR Code da reserva</button>
+          <div class="center muted small">ou digite manualmente</div>
+          <div class="field"><label for="ci-code">Código da reserva / localizador</label><input id="ci-code" name="code" maxlength="6" placeholder="ABC123" style="text-transform:uppercase;letter-spacing:.2em;font-size:20px;font-weight:700"></div>
+          <div class="field"><label for="ci-cpf">CPF ou documento do passageiro</label><input id="ci-cpf" name="cpf" data-mask="cpf" inputmode="numeric" placeholder="000.000.000-00"></div>
+          <div class="field"><label for="ci-date">Data do voo</label><input id="ci-date" name="date" type="date" value="2026-10-15"></div>
+          <div class="alert"><svg class="i"><use href="#i-info"/></svg><span>O localizador tem 6 letras/números e está no e-mail de confirmação da compra.</span></div>
+          <button class="btn btn-primary" type="submit" style="margin-top:auto">Buscar reserva</button>
+        </form>
+      </section>
+
+      <!-- C3 · Validando -->
+      <section class="screen dark" id="s-ci-validando" data-title="3 · Validando passageiro" data-group="Check-in">
+        <div class="centered">
+          <div class="spinner"></div>
+          <h2 class="title">Validando passageiro…</h2>
+          <p style="color:#b9cbf0">Estamos localizando sua reserva na companhia aérea.</p>
+        </div>
+      </section>
+
+      <!-- C4 · Confirmar voo -->
+      <section class="screen" id="s-ci-voo" data-title="4 · Confirmar voo" data-group="Check-in">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Check-in</h1>
+          <button class="ab-btn" data-tab-go="s-home" aria-label="Cancelar"><svg class="i"><use href="#i-x"/></svg></button>
+        </header>
+        <div class="stepper" data-step="3"></div>
+        <div class="content">
+          <h2 class="title">Confirme os dados do voo</h2>
+          <div class="card navy">
+            <div class="row"><div class="ph fixed on-dark" style="--w:40;--h:40" data-size="40×40"></div><b class="grow" data-bind="coName"></b><span class="chip ok" data-bind="flightStatus"></span></div>
+            <div class="route" style="margin-top:14px">
+              <div class="city"><b data-bind="fromCode"></b><span data-bind="fromCity"></span></div>
+              <div class="mid" style="color:#8fb6ff"><svg class="i"><use href="#i-plane"/></svg></div>
+              <div class="city end"><b data-bind="toCode"></b><span data-bind="toCity"></span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="kv"><span>Passageiro</span><span data-bind="userName"></span></div>
+            <div class="kv"><span>Voo</span><span data-bind="flightNo"></span></div>
+            <div class="kv"><span>Data e horário</span><span data-bind="dateTime"></span></div>
+            <div class="kv"><span>Portão de embarque</span><span data-bind="gate"></span></div>
+            <div class="kv"><span>Localizador</span><span data-bind="code"></span></div>
+          </div>
+          <div class="footer" style="margin:auto -16px -16px">
+            <button class="btn btn-primary" data-action="confirmFlight">Os dados estão corretos</button>
+            <button class="btn btn-ghost" data-action="wrongFlight">Não é o meu voo</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- C5 · Assento -->
+      <section class="screen" id="s-ci-assento" data-title="5 · Escolha do assento" data-group="Check-in">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Check-in</h1>
+          <button class="ab-btn" data-tab-go="s-home" aria-label="Cancelar"><svg class="i"><use href="#i-x"/></svg></button>
+        </header>
+        <div class="stepper" data-step="4"></div>
+        <div class="content">
+          <h2 class="title">Escolha seu assento</h2>
+          <div class="alert"><svg class="i"><use href="#i-info"/></svg><span>Você já tem o assento <b>14A</b> reservado. Mantenha-o ou escolha outro no mapa.</span></div>
+          <div class="legend"><span><i></i>Livre</span><span><i class="fee"></i>Com taxa</span><span><i class="occ"></i>Ocupado</span><span><i class="sel"></i>Seu assento</span></div>
+          <div class="plane">
+            <div class="nose">✈ FRENTE DA AERONAVE</div>
+            <div class="seats" id="seatmap"></div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="seat-summary">
+            <div class="big-seat" data-bind="seat"></div>
+            <div class="grow"><b data-bind="seatFeeTitle"></b><div class="small muted" data-bind="seatFeeText"></div></div>
+          </div>
+          <button class="btn btn-primary" data-action="confirmSeat">Confirmar assento</button>
+        </div>
+      </section>
+
+      <!-- C6 · Bagagem -->
+      <section class="screen" id="s-ci-bagagem" data-title="6 · Bagagem" data-group="Check-in">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Check-in</h1>
+          <button class="ab-btn" data-tab-go="s-home" aria-label="Cancelar"><svg class="i"><use href="#i-x"/></svg></button>
+        </header>
+        <div class="stepper" data-step="5"></div>
+        <div class="content">
+          <h2 class="title">Você vai despachar bagagem?</h2>
+          <div class="big-options" id="bag-options">
+            <button class="big-option" data-bag="yes"><span class="ico"><svg class="i lg"><use href="#i-bag"/></svg></span><span>Sim, tenho bagagem<small>Malas para despachar no balcão</small></span><span class="radio"></span></button>
+            <button class="big-option" data-bag="no"><span class="ico"><svg class="i lg"><use href="#i-check-circle"/></svg></span><span>Não, só bagagem de mão<small>Até 10 kg na cabine</small></span><span class="radio"></span></button>
+          </div>
+          <div id="bag-yes" hidden style="display:flex;flex-direction:column;gap:14px">
+            <div class="alert warn"><svg class="i"><use href="#i-alert"/></svg><span><b>Atenção:</b> você possui bagagem para despachar. Após finalizar o check-in, dirija-se ao balcão ou ponto de despacho de bagagem da sua companhia aérea antes de seguir para o embarque.</span></div>
+            <div class="card">
+              <div class="row"><b class="grow">Quantidade de malas</b>
+                <div class="stepper-num">
+                  <button data-bagstep="-1" aria-label="Menos"><svg class="i"><use href="#i-minus"/></svg></button>
+                  <output id="bag-count">1</output>
+                  <button data-bagstep="1" aria-label="Mais"><svg class="i"><use href="#i-plus"/></svg></button>
+                </div>
+              </div>
+              <div class="kv" style="margin-top:8px"><span>Franquia incluída</span><span>1 mala · até 23 kg</span></div>
+              <div class="kv"><span>Máximo permitido</span><span>3 malas</span></div>
+              <div class="kv"><span>Mala adicional</span><span>R$ 90,00 cada</span></div>
+            </div>
+          </div>
+          <div id="bag-no" hidden class="alert"><svg class="i"><use href="#i-info"/></svg><span>Sem bagagem para despachar, você segue direto para o raio-X e o portão de embarque.</span></div>
+        </div>
+        <div class="footer"><button class="btn btn-primary" id="bag-continue" data-action="confirmBag" disabled>Continuar</button></div>
+      </section>
+
+      <!-- C7 · Resumo -->
+      <section class="screen" id="s-ci-resumo" data-title="7 · Confirmar check-in" data-group="Check-in">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Check-in</h1>
+          <button class="ab-btn" data-tab-go="s-home" aria-label="Cancelar"><svg class="i"><use href="#i-x"/></svg></button>
+        </header>
+        <div class="stepper" data-step="6"></div>
+        <div class="content">
+          <h2 class="title">Confira e confirme</h2>
+          <div class="card">
+            <div class="kv"><span>Passageiro</span><span data-bind="userName"></span></div>
+            <div class="kv"><span>Voo</span><span><span data-bind="coName"></span> · <span data-bind="flightNo"></span></span></div>
+            <div class="kv"><span>Trecho</span><span><span data-bind="fromCode"></span> → <span data-bind="toCode"></span></span></div>
+            <div class="kv"><span>Data e horário</span><span data-bind="dateTime"></span></div>
+            <div class="kv"><span>Assento</span><span data-bind="seat"></span></div>
+            <div class="kv"><span>Bagagem</span><span data-bind="bagText"></span></div>
+          </div>
+          <div class="card">
+            <div class="kv"><span>Taxa de assento</span><span data-bind="seatFeeMoney"></span></div>
+            <div class="kv"><span>Taxa de bagagem</span><span data-bind="bagFeeMoney"></span></div>
+            <div class="kv" style="font-size:18px"><span>Total</span><span data-bind="totalMoney"></span></div>
+          </div>
+          <div class="alert warn" id="resumo-bag-alert" hidden><svg class="i"><use href="#i-alert"/></svg><span>Você precisará despachar sua bagagem no balcão antes do embarque.</span></div>
+        </div>
+        <div class="footer"><button class="btn btn-primary" data-action="confirmCheckin"><svg class="i"><use href="#i-check"/></svg> Confirmar check-in</button></div>
+      </section>
+
+      <!-- C8 · Cartão de embarque -->
+      <section class="screen dark" id="s-ci-cartao" data-title="8 · Cartão de embarque" data-group="Check-in">
+        <header class="appbar" style="background:transparent">
+          <h1 class="center" style="padding-left:48px">Cartão de embarque</h1>
+          <button class="ab-btn" data-tab-go="s-home" aria-label="Fechar"><svg class="i"><use href="#i-x"/></svg></button>
+        </header>
+        <div class="content">
+          <div class="success-head">
+            <div class="check"><svg class="i lg"><use href="#i-check"/></svg></div>
+            <h2 class="title">Check-in concluído!</h2>
+          </div>
+          <div class="boarding">
+            <div class="top"><div class="ph fixed on-dark" style="--w:40;--h:40" data-size="40×40"></div><div><b data-bind="coName"></b><span class="small" data-bind="flightNo"></span></div></div>
+            <div class="body">
+              <div class="route">
+                <div class="city"><b data-bind="fromCode"></b><span data-bind="fromCity"></span></div>
+                <div class="mid"><svg class="i" style="color:var(--blue)"><use href="#i-plane"/></svg></div>
+                <div class="city end"><b data-bind="toCode"></b><span data-bind="toCity"></span></div>
+              </div>
+              <div class="data">
+                <div><small>Passageiro</small><b data-bind="userName"></b></div>
+                <div><small>Assento</small><b data-bind="seat"></b></div>
+                <div><small>Data e horário</small><b data-bind="dateTime"></b></div>
+                <div><small>Portão</small><b data-bind="gate"></b></div>
+              </div>
+              <div class="cut"></div>
+              <div class="qr"><div class="ph" style="--w:200;--h:200" data-label="QR Code / código de barras" data-size="200×200"></div></div>
+            </div>
+          </div>
+          <div class="alert warn" id="cartao-bag-alert" hidden><svg class="i"><use href="#i-alert"/></svg><span>Você tem bagagem para despachar. Siga para o ponto de despacho da companhia antes do embarque.</span></div>
+        </div>
+        <div class="footer" style="background:var(--navy);border-color:var(--navy-700)">
+          <div class="field-row">
+            <button class="btn btn-white btn-sm" style="width:100%" data-action="saveCard"><svg class="i sm"><use href="#i-wallet"/></svg> Salvar no app</button>
+            <button class="btn btn-white btn-sm" style="width:100%" data-action="emailCard"><svg class="i sm"><use href="#i-mail"/></svg> Enviar e-mail</button>
+          </div>
+          <button class="btn btn-primary" data-action="afterCard">Continuar</button>
+        </div>
+      </section>
+
+      <!-- C9 · Despacho de bagagem -->
+      <section class="screen dark" id="s-ci-despacho" data-title="9 · Despacho de bagagem" data-group="Check-in">
+        <header class="appbar" style="background:transparent">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Próximos passos</h1>
+        </header>
+        <div class="content">
+          <h2 class="title">Despache sua bagagem antes de embarcar</h2>
+          <ul class="timeline light">
+            <li class="done">Check-in concluído</li>
+            <li class="now">Dirigir-se ao ponto de despacho<small>Balcão da <span data-bind="coName"></span> — fechamento 60 min antes do voo</small></li>
+            <li>Seguir para o raio-X</li>
+            <li>Ir ao portão de embarque <b data-bind="gate"></b></li>
+          </ul>
+          <div class="ph on-dark" style="--w:358;--h:160" data-label="Mapa do aeroporto / balcão" data-size="358×160"></div>
+        </div>
+        <div class="footer" style="background:var(--navy);border-color:var(--navy-700)">
+          <button class="btn btn-primary" data-action="finishFlow">Entendi</button>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           MINHAS VIAGENS
+           ======================================================== -->
+
+      <!-- V1 · Lista -->
+      <section class="screen" id="s-viagens" data-title="Minhas viagens" data-group="Viagens" data-tab="viagens">
+        <header class="appbar pad-left"><h1>Minhas Viagens</h1></header>
+        <div class="content">
+          <div class="segment" id="trip-seg"><button class="on" data-seg="next">Próximas</button><button data-seg="past">Histórico</button></div>
+          <div id="trip-list" style="display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+      </section>
+
+      <!-- V2 · Detalhe / acompanhamento -->
+      <section class="screen" id="s-viagem" data-title="Acompanhamento da viagem" data-group="Viagens">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Viagem <span data-bind="flightNo"></span></h1>
+        </header>
+        <div class="content">
+          <div class="card navy">
+            <div class="route">
+              <div class="city"><b data-bind="fromCode"></b><span data-bind="fromCity"></span></div>
+              <div class="mid" style="color:#8fb6ff"><svg class="i"><use href="#i-plane"/></svg></div>
+              <div class="city end"><b data-bind="toCode"></b><span data-bind="toCity"></span></div>
+            </div>
+            <div class="row small" style="margin-top:12px;color:#b9cbf0"><svg class="i sm"><use href="#i-calendar"/></svg><span data-bind="dateTime"></span></div>
+          </div>
+          <div class="section-title">Status da viagem</div>
+          <div class="card"><ul class="timeline" id="status-timeline" style="margin-bottom:-18px"></ul></div>
+          <div class="card">
+            <div class="kv"><span>Reserva</span><span data-bind="code"></span></div>
+            <div class="kv"><span>Companhia</span><span data-bind="coName"></span></div>
+            <div class="kv"><span>Check-in</span><span data-bind="checkinText"></span></div>
+            <div class="kv"><span>Assento</span><span data-bind="seat"></span></div>
+            <div class="kv"><span>Bagagem</span><span data-bind="bagText"></span></div>
+            <div class="kv"><span>Portão</span><span data-bind="gate"></span></div>
+          </div>
+          <button class="btn btn-primary" data-action="tripPrimary" id="trip-primary"></button>
+          <button class="btn btn-ghost btn-sm" style="width:100%" data-action="nextStatus">Simular próximo status (protótipo)</button>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           COMPRA DE PASSAGENS
+           ======================================================== -->
+
+      <!-- P1 · Busca -->
+      <section class="screen" id="s-busca" data-title="Buscar voos" data-group="Compra">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Comprar passagem</h1>
+        </header>
+        <form class="content form" data-submit="search" novalidate style="gap:14px">
+          <div class="alert" id="guest-alert" hidden><svg class="i"><use href="#i-info"/></svg><span>Você pode consultar voos e preços. Para comprar, é preciso entrar ou se cadastrar.</span></div>
+          <div class="field"><label>Origem</label><select name="from" id="sr-from"></select></div>
+          <button type="button" class="btn btn-ghost btn-sm" data-action="swap" style="align-self:center"><svg class="i sm"><use href="#i-swap"/></svg> Inverter</button>
+          <div class="field"><label>Destino</label><select name="to" id="sr-to"></select></div>
+          <div class="field-row">
+            <div class="field"><label>Ida</label><input type="date" name="d1" value="2026-10-20"></div>
+            <div class="field"><label>Volta</label><input type="date" name="d2" id="sr-d2" value="2026-10-27"></div>
+          </div>
+          <label class="row small"><input type="checkbox" id="sr-oneway" style="width:22px;height:22px"> Somente ida</label>
+          <div class="card row">
+            <div class="grow"><b>Passageiros</b><div class="small muted">Adultos</div></div>
+            <div class="stepper-num">
+              <button type="button" data-paxstep="-1" aria-label="Menos"><svg class="i"><use href="#i-minus"/></svg></button>
+              <output id="sr-pax">1</output>
+              <button type="button" data-paxstep="1" aria-label="Mais"><svg class="i"><use href="#i-plus"/></svg></button>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit"><svg class="i"><use href="#i-search"/></svg> Pesquisar voos</button>
+        </form>
+      </section>
+
+      <!-- P2 · Resultados -->
+      <section class="screen" id="s-voos" data-title="Voos disponíveis" data-group="Compra">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1 id="voos-title">Voos</h1>
+        </header>
+        <div class="content">
+          <p class="subtitle" id="voos-sub"></p>
+          <div id="voos-list" style="display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+      </section>
+
+      <!-- P3 · Pagamento -->
+      <section class="screen" id="s-pagamento" data-title="Pagamento" data-group="Compra">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Pagamento</h1>
+        </header>
+        <div class="content">
+          <div class="card">
+            <div class="row"><b class="grow" id="pg-flight"></b><span class="chip" id="pg-pax"></span></div>
+            <div class="small muted" id="pg-route"></div>
+            <div class="kv" style="margin-top:8px"><span>Passagens</span><span id="pg-base"></span></div>
+            <div class="kv"><span>Taxas de embarque</span><span id="pg-tax"></span></div>
+            <div class="kv" style="font-size:18px"><span>Total</span><span id="pg-total"></span></div>
+          </div>
+          <div class="section-title">Forma de pagamento</div>
+          <div class="segment" id="pay-seg" style="flex-wrap:wrap">
+            <button class="on" data-pay="credit">Crédito</button><button data-pay="debit">Débito</button><button data-pay="pix">PIX</button><button data-pay="wallet">Carteira</button>
+          </div>
+          <div class="pay-panel" id="pay-card">
+            <div class="field"><label>Número do cartão</label><input id="cc-num" data-mask="card" inputmode="numeric" placeholder="0000 0000 0000 0000"></div>
+            <div class="field"><label>Nome impresso</label><input id="cc-name" placeholder="MARIA S LIMA"></div>
+            <div class="field-row">
+              <div class="field"><label>Validade</label><input id="cc-exp" data-mask="exp" inputmode="numeric" placeholder="MM/AA"></div>
+              <div class="field"><label>CVV</label><input id="cc-cvv" maxlength="4" inputmode="numeric" placeholder="123"></div>
+            </div>
+            <div class="field" id="cc-inst-wrap"><label>Parcelas</label><select id="cc-inst"></select></div>
+          </div>
+          <div class="pay-panel" id="pay-pix" hidden style="align-items:center">
+            <div class="ph" style="--w:180;--h:180" data-label="QR Code PIX" data-size="180×180"></div>
+            <div class="card flat small" style="word-break:break-all;width:100%">00020126580014br.gov.bcb.pix0136skycheck-demo-0000-1111-2222</div>
+            <button class="btn btn-ghost btn-sm" style="width:100%" data-action="copyPix"><svg class="i sm"><use href="#i-copy"/></svg> Copiar código PIX</button>
+          </div>
+          <div class="pay-panel" id="pay-wallet" hidden>
+            <div class="alert"><svg class="i"><use href="#i-wallet"/></svg><span>Você será redirecionado para a sua carteira digital para autorizar o pagamento.</span></div>
+          </div>
+        </div>
+        <div class="footer"><button class="btn btn-primary" data-action="pay"><svg class="i"><use href="#i-lock"/></svg> Pagar <span id="pg-btn-total"></span></button></div>
+      </section>
+
+      <!-- P4 · Confirmação -->
+      <section class="screen dark" id="s-confirmacao" data-title="Compra confirmada" data-group="Compra">
+        <div class="centered">
+          <div class="success-head"><div class="check"><svg class="i lg"><use href="#i-check"/></svg></div><h2 class="title">Reserva confirmada!</h2></div>
+          <div class="card" style="width:100%;color:var(--navy);text-align:left">
+            <div class="kv"><span>Localizador</span><span id="cf-code"></span></div>
+            <div class="kv"><span>Voo</span><span id="cf-flight"></span></div>
+            <div class="kv"><span>Trecho</span><span id="cf-route"></span></div>
+            <div class="kv"><span>Total pago</span><span id="cf-total"></span></div>
+          </div>
+          <p style="color:#b9cbf0" class="small">Enviamos a confirmação para o seu e-mail.</p>
+          <div style="width:100%;display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-primary" data-go="s-reservas">Ver minhas reservas</button>
+            <button class="btn btn-white" data-tab-go="s-home">Voltar ao início</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           RESERVAS / BAGAGEM
+           ======================================================== -->
+
+      <!-- R1 · Passagens e reservas -->
+      <section class="screen" id="s-reservas" data-title="Passagens e reservas" data-group="Reservas">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Passagens e Reservas</h1>
+        </header>
+        <div class="content">
+          <div class="section-title">Reservas</div>
+          <div id="res-list" style="display:flex;flex-direction:column;gap:12px"></div>
+          <div class="section-title">Cartões de embarque salvos</div>
+          <div id="cards-list" style="display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+      </section>
+
+      <!-- B1 · Bagagem -->
+      <section class="screen" id="s-bagagem" data-title="Bagagem" data-group="Bagagem">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Bagagem</h1>
+        </header>
+        <div class="content">
+          <div class="card navy">
+            <div class="section-title" style="color:#b9cbf0;margin-top:0">Sua bagagem</div>
+            <div class="row" style="margin-top:8px"><svg class="i lg"><use href="#i-bag"/></svg><div class="grow"><b data-bind="bagText"></b><div class="small" style="color:#b9cbf0" data-bind="bagStatus"></div></div></div>
+          </div>
+          <div class="section-title">Regras gerais</div>
+          <div class="list">
+            <div class="list-item"><span class="ico"><svg class="i"><use href="#i-bag"/></svg></span><div class="txt"><b>Bagagem de mão</b><span>1 item de até 10 kg e 55×35×25 cm</span></div></div>
+            <div class="list-item"><span class="ico"><svg class="i"><use href="#i-bag"/></svg></span><div class="txt"><b>Bagagem despachada</b><span>1 mala de até 23 kg inclusa · adicional R$ 90,00</span></div></div>
+            <div class="list-item"><span class="ico"><svg class="i"><use href="#i-clock"/></svg></span><div class="txt"><b>Fechamento do despacho</b><span>60 minutos antes do voo</span></div></div>
+            <div class="list-item"><span class="ico"><svg class="i"><use href="#i-alert"/></svg></span><div class="txt"><b>Itens proibidos</b><span>Líquidos acima de 100 ml na bagagem de mão, inflamáveis, baterias soltas</span></div></div>
+          </div>
+          <div class="ph" style="--w:358;--h:140" data-label="Ilustração de medidas da mala" data-size="358×140"></div>
+          <button class="btn btn-ghost" data-toast="info|Em breve|Compra de bagagem extra estará disponível numa próxima versão.">Comprar bagagem extra</button>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           PERFIL
+           ======================================================== -->
+
+      <!-- F1 · Perfil -->
+      <section class="screen" id="s-perfil" data-title="Meu perfil" data-group="Perfil" data-tab="perfil">
+        <div class="content" style="padding:0;gap:0">
+          <div class="hero" style="padding-bottom:56px;text-align:center">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:12px">
+              <div class="ph fixed round on-dark" style="--w:88;--h:88" data-size="88×88"></div>
+              <h1 style="font-size:22px" data-bind="userName"></h1>
+              <span class="chip" style="background:rgba(255,255,255,.15);color:#fff" data-bind="userEmail"></span>
+            </div>
+          </div>
+          <div class="home-body">
+            <div class="card">
+              <div class="kv"><span>CPF</span><span data-bind="userCpf"></span></div>
+              <div class="kv"><span>Telefone</span><span data-bind="userPhone"></span></div>
+              <div class="kv"><span>Nascimento</span><span data-bind="userBorn"></span></div>
+              <div class="kv"><span>Endereço</span><span data-bind="userAddr"></span></div>
+              <div class="kv"><span>Documento</span><span>RG · verificado</span></div>
+            </div>
+            <button class="btn btn-primary" data-go="s-perfil-edit"><svg class="i"><use href="#i-user"/></svg> Editar meus dados</button>
+            <button class="btn btn-ghost" data-action="logout"><svg class="i"><use href="#i-logout"/></svg> Sair</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- F2 · Editar perfil -->
+      <section class="screen" id="s-perfil-edit" data-title="Editar dados" data-group="Perfil">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Editar dados</h1>
+        </header>
+        <form class="content form" data-submit="saveProfile" novalidate>
+          <div class="field"><label>Nome completo</label><input name="nome" id="pf-nome"></div>
+          <div class="input-action">
+            <div class="field"><label>CPF</label><input id="pf-cpf" readonly></div>
+            <button type="button" class="btn btn-ghost btn-sm" data-verify="pf-cpf"><svg class="i sm"><use href="#i-lock"/></svg> Alterar</button>
+          </div>
+          <div class="field"><label>E-mail</label><input name="email" id="pf-email" type="email"></div>
+          <div class="field"><label>Telefone</label><input name="tel" id="pf-tel" data-mask="phone"></div>
+          <div class="field"><label>Endereço completo</label><input name="addr" id="pf-addr"></div>
+          <div class="input-action">
+            <div class="field"><label>Documento de identificação</label><input id="pf-doc" value="RG 12.345.678-9" readonly></div>
+            <button type="button" class="btn btn-ghost btn-sm" data-verify="pf-doc"><svg class="i sm"><use href="#i-lock"/></svg> Alterar</button>
+          </div>
+          <div class="alert"><svg class="i"><use href="#i-shield"/></svg><span>CPF e documento exigem nova validação por segurança.</span></div>
+          <button class="btn btn-primary" type="submit">Salvar alterações</button>
+        </form>
+      </section>
+
+      <!-- ========================================================
+           AJUDA
+           ======================================================== -->
+
+      <!-- H1 · Ajuda -->
+      <section class="screen" id="s-ajuda" data-title="Ajuda e atendimento" data-group="Ajuda" data-tab="ajuda">
+        <header class="appbar pad-left"><h1>Ajuda e Atendimento</h1></header>
+        <div class="content">
+          <div class="grid-2">
+            <button class="tile" data-action="openChat"><span class="ico"><svg class="i"><use href="#i-chat"/></svg></span>Chat de atendimento</button>
+            <button class="tile" data-toast="info|Telefone|Ligando para 0800 123 4567…"><span class="ico"><svg class="i"><use href="#i-phone"/></svg></span>0800 123 4567</button>
+            <button class="tile" data-toast="info|E-mail|Abrindo e-mail para suporte@skycheck.app"><span class="ico"><svg class="i"><use href="#i-mail"/></svg></span>suporte@skycheck.app</button>
+            <button class="tile" data-go="s-solicitacoes"><span class="ico"><svg class="i"><use href="#i-list"/></svg></span>Minhas solicitações</button>
+          </div>
+          <div class="section-title">Orientações</div>
+          <div class="list">
+            <button class="list-item" data-info="checkin"><span class="ico"><svg class="i"><use href="#i-plane"/></svg></span><span class="txt"><b>Como fazer check-in</b><span>Passo a passo</span></span><svg class="i"><use href="#i-chevron"/></svg></button>
+            <button class="list-item" data-info="bagagem"><span class="ico"><svg class="i"><use href="#i-bag"/></svg></span><span class="txt"><b>Orientações sobre bagagem</b><span>Limites e despacho</span></span><svg class="i"><use href="#i-chevron"/></svg></button>
+            <button class="list-item" data-info="docs"><span class="ico"><svg class="i"><use href="#i-file"/></svg></span><span class="txt"><b>Documentos necessários</b><span>O que levar ao aeroporto</span></span><svg class="i"><use href="#i-chevron"/></svg></button>
+            <button class="list-item" data-info="embarque"><span class="ico"><svg class="i"><use href="#i-clock"/></svg></span><span class="txt"><b>Informações de embarque</b><span>Horários e portões</span></span><svg class="i"><use href="#i-chevron"/></svg></button>
+          </div>
+          <div class="section-title">Perguntas frequentes</div>
+          <details class="faq"><summary>Quando o check-in fica disponível?</summary><p>Geralmente de 48 horas até 60 minutos antes do voo, dependendo da companhia.</p></details>
+          <details class="faq"><summary>Posso alterar o assento depois?</summary><p>Sim, enquanto o check-in estiver aberto. Assentos com taxa podem ter custo adicional.</p></details>
+          <details class="faq"><summary>Perdi meu cartão de embarque. E agora?</summary><p>Ele fica salvo em Passagens e Reservas. Você também pode reenviá-lo para o seu e-mail.</p></details>
+        </div>
+      </section>
+
+      <!-- H2 · Chat -->
+      <section class="screen" id="s-chat" data-title="Chat de atendimento" data-group="Ajuda">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Chat de atendimento</h1>
+          <span class="chip ok">online</span>
+        </header>
+        <div class="chat-log" id="chat-log"></div>
+        <form class="chat-form" data-submit="sendChat">
+          <input id="chat-input" placeholder="Digite sua mensagem" autocomplete="off">
+          <button aria-label="Enviar"><svg class="i"><use href="#i-send"/></svg></button>
+        </form>
+      </section>
+
+      <!-- H3 · Solicitações -->
+      <section class="screen" id="s-solicitacoes" data-title="Minhas solicitações" data-group="Ajuda">
+        <header class="appbar">
+          <button class="ab-btn" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+          <h1>Minhas solicitações</h1>
+        </header>
+        <div class="content">
+          <div class="card"><div class="row"><b class="grow">#2026-00412</b><span class="chip warn">Em análise</span></div><p class="small muted" style="margin-top:6px">Alteração de nome no bilhete · aberto em 28 set 2026</p></div>
+          <div class="card"><div class="row"><b class="grow">#2026-00377</b><span class="chip ok">Resolvida</span></div><p class="small muted" style="margin-top:6px">Reenvio de cartão de embarque · aberto em 10 set 2026</p></div>
+        </div>
+      </section>
+
+    </div><!-- /viewport -->
+
+    <!-- Tabbar -->
+    <nav class="tabbar" id="tabbar" hidden aria-label="Navegação principal">
+      <button data-tab-go="s-home" data-tab="home"><svg class="i"><use href="#i-home"/></svg>Início</button>
+      <button data-tab-go="s-viagens" data-tab="viagens"><svg class="i"><use href="#i-bag"/></svg>Viagens</button>
+      <button class="tab-cta" data-action="startCheckin"><span class="dot"><svg class="i"><use href="#i-plane"/></svg></span>Check-in</button>
+      <button data-tab-go="s-ajuda" data-tab="ajuda"><svg class="i"><use href="#i-help"/></svg>Ajuda</button>
+      <button data-tab-go="s-perfil" data-tab="perfil"><svg class="i"><use href="#i-user"/></svg>Perfil</button>
+    </nav>
+
+    <!-- Sheets -->
+    <div class="backdrop" id="backdrop"></div>
+
+    <div class="sheet" id="sheet-qr" role="dialog" aria-label="Ler QR Code">
+      <div class="grip"></div>
+      <h2>Ler QR Code</h2>
+      <div class="ph cam" style="--w:300;--h:300" data-label="Visor da câmera" data-size="300×300"></div>
+      <button class="btn btn-primary" data-action="fakeScan">Simular leitura</button>
+      <button class="btn btn-ghost" data-close-sheet>Cancelar</button>
+    </div>
+
+    <div class="sheet" id="sheet-verify" role="dialog" aria-label="Validação de segurança">
+      <div class="grip"></div>
+      <h2>Validação de segurança</h2>
+      <p class="subtitle">Enviamos um código de 6 dígitos para o seu e-mail. (Protótipo: use <b>123456</b>)</p>
+      <div class="field"><label for="vf-code">Código</label><input id="vf-code" maxlength="6" inputmode="numeric" placeholder="000000" style="text-align:center;letter-spacing:.4em;font-size:22px"></div>
+      <button class="btn btn-primary" data-action="verifyCode">Validar</button>
+      <button class="btn btn-ghost" data-close-sheet>Cancelar</button>
+    </div>
+
+    <div class="sheet" id="sheet-info" role="dialog">
+      <div class="grip"></div>
+      <h2 id="info-title"></h2>
+      <div id="info-body" style="display:flex;flex-direction:column;gap:10px"></div>
+      <button class="btn btn-primary" data-close-sheet>Entendi</button>
+    </div>
+
+  </div><!-- /phone -->
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
